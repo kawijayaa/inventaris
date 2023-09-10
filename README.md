@@ -167,6 +167,7 @@
 </details>
 
 ## Django Web App Diagram
+![Django Diagram](https://cdn.discordapp.com/attachments/1057322303731548192/1150395731182637066/Django_Diagram.png)
 
 ## The Purpose of Virtual Environment
 
