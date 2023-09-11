@@ -167,8 +167,21 @@
 </details>
 
 ## Django Web App Diagram
-![Django Diagram](https://cdn.discordapp.com/attachments/1057322303731548192/1150395731182637066/Django_Diagram.png)
+![Django Diagram](https://cdn.discordapp.com/attachments/1057322303731548192/1150633658449924136/django.png)
+
+When the user is accessing a Django-based website, the ```urls.py``` will try to recognize which section of the website the user is trying to access. For example, if the user is accessing ```localhost:8000/login```, then ```urls.py``` will try to find if there is a routing for ```login/```.
+
+
+If there is a ```login/``` in ```urls.py```, then it will access the views associated to the url in the ```views.py``` file.
+
+The ```views.py``` file will return the HTML template and will be rendered to the user.
+
+The ```views.py``` could communicate with ```models.py``` if data is needed.
+
+And ```models.py``` will comunicate with the Database to fetch the data needed.
 
 ## The Purpose of Virtual Environment
+
+The purpose of virtual environments are to help isolate the Python version and the packages used in different projects. It is possible to create a Django project without one, but it would be easier and more 'correct' to use a virtual environment. The reason why virtual environment is used so that packages between projects are not conflicting. You could have the case where one project have a lower version of a package than the other project. On that case, using a virtual environment will make it easier to manage Python and package version between different projects.
 
 ## MVC, MVT, MVVM
