@@ -1,6 +1,17 @@
-<h1>Inventaris</h1>
+{% extends 'base.html' %}
 
-<h5>Name: </h5>
-<p>{{ name }}</p>
-<h5>Class: </h5>
-<p>{{ class }}</p>
+{% block content %}
+<h1 style="font-weight: 900; font-size: 3em;">INVENTARIS</h1>
+<div style="display: flex; gap: 1em;">
+    <h3>Name: {{name}}</h3>
+    <h3>Class: {{class}}</h3>
+</div>
+
+{% include 'product_table.html' %}
+
+<a href="{% url 'main:create_product' %}">
+    <button>
+        Add New Product
+    </button>
+</a>
+{% endblock content %}

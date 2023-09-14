@@ -1,0 +1,27 @@
+{% block content %}
+<table style="text-align: center; border: 1px solid; border-collapse: collapse;">
+    <tr>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Name</th>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Amount</th>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Description</th>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Category</th>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Price</th>
+        <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Date Added</th>
+    </tr>
+
+    {% comment %} Below is how to show the product data {% endcomment %}
+
+    {% for product in products %}
+        <tr>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.name}}</td>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.amount}}</td>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.description}}</td>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.category}}</td>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.price}}</td>
+            <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.date_added}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h5>Total: {{product_count}} product{{plural}}</h5>
+{% endblock content %}
