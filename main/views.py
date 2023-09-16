@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from main.forms import ProductForm
 from main.models import Product

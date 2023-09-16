@@ -2,6 +2,7 @@
 #### Muhammad Oka - 2206046784
 
 ## Assignment Steps
+### Assignment 2
 <details>
 <summary>Create a new Django project</summary>
 
@@ -195,6 +196,97 @@
     
 </details>
 
+### Assignment 3
+<details>
+<summary>Create a form input to add a model object to the previous app.</summary>
+
+1. Create ```forms.py``` in the main subdirectory
+
+    ```python
+    # main/forms.py
+
+    from django.forms import ModelForm
+    from main.models import Product
+
+    class ProductForm(ModelForm):
+        class Meta:
+            model = Product
+            fields = ['name', 'amount', 'description', 'category', 'price']
+    ```
+
+</details>
+
+<details>
+<summary>Add 5 views to view the added objects in HTML, XML, JSON, XML by ID, and JSON by ID formats.</summary>
+
+1. Add new views to ```views.py```
+
+    ```python
+    # main/views.py
+
+    # ...
+    def show_products(request):
+        products = Product.objects.all()
+        product_count = products.count()
+
+        context = {
+            'products': products,
+            'product_count': product_count,
+            'plural': 's' if product_count != 1 else '',
+        }
+
+        return render(request, 'show_products.html', context)
+
+    def show_xml(request):
+        products = Product.objects.all()
+        data = serializers.serialize('xml', products)
+
+        return HttpResponse(data, content_type='application/xml')
+
+    def show_json(request):
+        products = Product.objects.all()
+        data = serializers.serialize('json', products)
+
+        return HttpResponse(data, content_type='application/json')
+
+    def show_xml_by_id(request, id):
+        product = Product.objects.filter(pk=id)
+        data = serializers.serialize('xml', product)
+
+        return HttpResponse(data, content_type='application/xml')
+
+    def show_json_by_id(request, id):
+        product = Product.objects.filter(pk=id)
+        data = serializers.serialize('json', product)
+
+        return HttpResponse(data, content_type='application/json')
+    ```
+    
+</details>
+
+<details>
+<summary>Create URL routing for each of the views added in point 2.</summary>
+
+1. Add new routings to ```urls.py```
+
+    ```python
+    # main/urls.py
+
+    # ...
+    urlpatterns = [
+        path('', show_main, name='show_main'),
+        path('products/', show_products, name='show_products'),
+        path('products/create/', create_product, name='create_product'),
+        path('products/delete/<int:id>/', delete_product, name='delete_product'),
+        path('products/xml/', show_xml, name='show_xml'),
+        path('products/xml/<int:id>/', show_xml_by_id, name='show_xml_by_id'),
+        path('products/json/', show_json, name='show_json'),
+        path('products/json/<int:id>/', show_json_by_id, name='show_json_by_id'),
+    ]
+    ```
+
+</details>
+
 ## Django Web App Diagram
 ![Django Diagram](https://cdn.discordapp.com/attachments/1057322303731548192/1150633658449924136/django.png)
 
@@ -220,3 +312,32 @@ The purpose of virtual environments are to help isolate the Python version and t
 **MVT** stands for **Model-View-Template**. The model and View are the same with MVC. But the big difference between MVT and MVC is, MVT use a template to define the user interface.
 
 **MVVM** stands for **Model-View-ViewModel**. The model and view are the same as the other two. The ViewModel acts as a 'converter' to convert the models to a view that can be rendered to the user.
+
+## POST vs GET
+
+Forms using the POST method is intended to send the data from the form to the server. Forms using the GET method is inteded to get data from the server and not change anything on the server.
+
+## HTML, JSON, XML
+
+HTML is used to describe how a data is displayed. JSON and XML are used as a way to store data. The difference between JSON and XML is, JSON uses key-value pairs, whereas XML uses a tree.
+
+## Why is JSON commonly used in Web Development
+
+JSON is more common because it's more human-readable and more simple than XML. JSON is also easier to parse for programming languages. It can be converted into a dictionary in Python and object in JS.
+
+## Check API Endpoint with Postman
+
+### GET /products
+![GET /products](https://cdn.discordapp.com/attachments/1057322303731548192/1152510286750830622/image.png)
+
+### GET /products/xml
+![GET /products/xml](https://cdn.discordapp.com/attachments/1057322303731548192/1152510344372178944/image.png)
+
+### GET /products/xml/5
+![GET /products/xml/5](https://cdn.discordapp.com/attachments/1057322303731548192/1152510476538888323/image.png)
+
+### GET /products/json
+![GET /products/json](https://cdn.discordapp.com/attachments/1057322303731548192/1152510409253867520/image.png)
+
+### GET /products/json/5
+![GET /products/json/5](https://cdn.discordapp.com/attachments/1057322303731548192/1152510530016268318/image.png)
