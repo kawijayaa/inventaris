@@ -34,7 +34,7 @@ def delete_product(request, id):
     try:
         product = Product.objects.get(pk=id)
         product.delete()
-        return HttpResponse(status=200)
+        return HttpResponseRedirect(reverse('main:show_main'))
     except Product.DoesNotExist:
         return HttpResponse(status=204)
 

@@ -265,24 +265,29 @@
     {% block content %}
     <table style="text-align: center; border: 1px solid; border-collapse: collapse;">
         <tr>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Name</th>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Amount</th>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Description</th>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Category</th>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Price</th>
-            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Date Added</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Name</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Amount</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Description</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Category</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Price</th>
+            <th style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Date Added</th>
         </tr>
 
         {% comment %} Below is how to show the product data {% endcomment %}
 
         {% for product in products %}
             <tr>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.name}}</td>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.amount}}</td>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.description}}</td>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.category}}</td>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.price}}</td>
-                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.date_added}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.name}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.amount}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.description}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.category}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.price}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.date_added}}</td>
+                <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 1em; padding-right: 1em; border: 1px solid; border-collapse: collapse;">
+                    <a href="/products/delete/{{product.id}}">
+                        <button>X</button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>
@@ -397,6 +402,14 @@
     # main/views.py
 
     # ...
+    def delete_product(request, id):
+        try:
+            product = Product.objects.get(pk=id)
+            product.delete()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        except Product.DoesNotExist:
+            return HttpResponse(status=204)
+
     def show_products(request):
         products = Product.objects.all()
         product_count = products.count()
