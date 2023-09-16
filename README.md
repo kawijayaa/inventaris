@@ -213,13 +213,185 @@
             model = Product
             fields = ['name', 'amount', 'description', 'category', 'price']
     ```
+2. Create a base template
+
+    ```html
+    <!-- templates/base.html -->
+
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            />
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+            {% block meta %}
+            {% endblock meta %}
+        </head>
+
+        <body style="display: flex; align-items: center; flex-direction: column; font-family: 'Roboto', sans-serif;">
+            {% block content %}
+            {% endblock content %}
+        </body>
+    </html>
+    
+    ```
+3. Add root templates folder to ```settings.py```
+
+    ```python
+    # inventaris/settings.py
+
+    # ...
+    TEMPLATES = [
+        {
+            # ...
+            'DIRS': [BASE_DIR / 'templates'],
+            # ...
+        },
+    ]
+    # ...
+    ```
+
+4. Create new template ```product_table.html```
+
+    ```html
+    <!-- main/templates/product_table.html -->
+    
+    {% block content %}
+    <table style="text-align: center; border: 1px solid; border-collapse: collapse;">
+        <tr>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Name</th>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Amount</th>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Description</th>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Category</th>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Price</th>
+            <th style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">Date Added</th>
+        </tr>
+
+        {% comment %} Below is how to show the product data {% endcomment %}
+
+        {% for product in products %}
+            <tr>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.name}}</td>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.amount}}</td>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.description}}</td>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.category}}</td>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.price}}</td>
+                <td style="padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">{{product.date_added}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h5>Total: {{product_count}} product{{plural}}</h5>
+    {% endblock content %}
+    ```
+
+5. Update the ```main.html``` template
+    ```html
+    <!-- main/templates/main.html -->
+
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <h1 style="font-weight: 900; font-size: 3em;">INVENTARIS</h1>
+    <div style="display: flex; gap: 1em;">
+        <h3>Name: {{name}}</h3>
+        <h3>Class: {{class}}</h3>
+    </div>
+
+    {% include 'product_table.html' %}
+
+    <a href="{% url 'main:create_product' %}">
+        <button>
+            Add New Product
+        </button>
+    </a>
+    {% endblock content %}
+    
+    ```
+
+6. Create a new template ```create_product.html``` and make the form to POST data
+
+    ```html
+    <!-- main/templates/create_product.html -->
+
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <h1>Add New Product</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="Add Product"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+    {% endblock content %}
+    ```
+
+7. Create the view to create product
+
+    ```python
+    # main/views.py
+
+    # ...
+    def create_product(request):
+        form = ProductForm(request.POST or None)
+
+        if form.is_valid() and request.method == 'POST':
+            form.save()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        
+        context = {'form': form}
+        return render(request, 'create_product.html', context)
+    # ...
+    ```
+    
+8. Create the url routing to create product
+
+    ```py
+    # main/urls.py
+
+    # ...
+    urlpatterns = [
+        # ...
+        path('products/create/', create_product, name='create_product'),
+        # ...
+    ]
+    # ...
+    ```
 
 </details>
 
 <details>
 <summary>Add 5 views to view the added objects in HTML, XML, JSON, XML by ID, and JSON by ID formats.</summary>
 
-1. Add new views to ```views.py```
+1. Create new template ```show_products.html``` to show the products in HTML.
+
+    ```html
+    <!-- main/templates/show_products.html -->
+    
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <h1>Products List</h1>
+
+    {% include 'product_table.html' %}
+    {% endblock content %}
+    ```
+
+2. Add new views to ```views.py```
 
     ```python
     # main/views.py
