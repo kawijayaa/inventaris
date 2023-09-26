@@ -472,6 +472,476 @@
 
 </details>
 
+### Assignment 4
+
+<details>
+
+<summary>Implement registration, login, and logout functions</summary>
+
+1. Create the ```register.html``` template
+
+    ```html
+    <!-- main/templates/register.html -->
+
+    {% extends 'base.html' %}
+
+    {% block meta %}
+        <title>Register</title>
+    {% endblock meta %}
+
+    {% block content %}  
+    <h1>Register</h1>  
+
+        <form method="POST" >  
+            {% csrf_token %}  
+            <table>  
+                {{ form.as_table }}  
+                <tr>  
+                    <td></td>
+                    <td><input type="submit" name="submit" value="Daftar"/></td>  
+                </tr>  
+            </table>  
+        </form>
+
+    {% if messages %}  
+        <ul>   
+            {% for message in messages %}  
+                <li>{{ message }}</li>  
+                {% endfor %}  
+        </ul>   
+    {% endif %}
+    {% endblock content %}
+    ```
+2. Add new view for the register form
+
+    ```py
+    # main/views.py
+
+    # ...
+    def register(request):
+        form = UserCreationForm()
+
+        if request.method == "POST":
+            form = UserCreationForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Your account has been successfully created!')
+                return redirect('main:login')
+        context = {'form':form}
+        return render(request, 'register.html', context)
+    # ...
+    ```
+
+3. Create the ```login.html``` template
+
+    ```html
+    <!-- main/templates/login.html -->
+
+    {% extends 'base.html' %}
+
+    {% block meta %}
+        <title>Login</title>
+    {% endblock meta %}
+
+    {% block content %}
+
+    <h1 style="font-weight: 900; font-size: 3em;">INVENTARIS</h1>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td>Username: </td>
+                <td><input type="text" name="username" placeholder="Username" class="form-control"></td>
+            </tr>
+                    
+            <tr>
+                <td>Password: </td>
+                <td><input type="password" name="password" placeholder="Password" class="form-control"></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td><input class="btn login_btn" type="submit" value="Login"></td>
+            </tr>
+        </table>
+    </form>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}     
+        
+    Don't have an account yet? <a href="{% url 'main:register' %}">Register Now</a>
+
+    {% endblock content %}
+    ```
+4. Create a new view for the login form
+
+    ```py
+    # main/views.py
+
+    # ...
+    def login_user(request):
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                response = HttpResponseRedirect(reverse("main:show_main")) 
+                response.set_cookie('last_login', str(datetime.datetime.now()))
+                return response
+            else:
+                messages.info(request, 'Sorry, incorrect username or password. Please try again.')
+        context = {}
+        return render(request, 'login.html', context)
+    # ...
+    ```
+
+5. Create the view to handle logging out
+
+    ```py
+    # main/views.py
+
+    # ...
+    def logout_user(request):
+        logout(request)
+        response = HttpResponseRedirect(reverse('main:login'))
+        response.delete_cookie('last_login')
+        return response
+    # ...
+    ```
+
+6. Route the created views
+
+    ```py
+    # main/urls.py
+
+    urlpatterns = [
+        # ...
+        path('register/', register, name='register'),
+        path('login/', login_user, name='login'),
+        path('logout/', logout_user, name='logout'),
+        # ...
+    ]
+    ```
+
+</details>
+
+<details>
+
+<summary>Create two user accounts with three dummy data entries for each account</summary>
+
+### First user
+
+![User1](https://cdn.discordapp.com/attachments/1057322303731548192/1156282140854603807/image.png?ex=65146729&is=651315a9&hm=11e75d2890d91dea2dca596b92351094b036b9db12d49fd932dfcb3d4e6f5782&)
+
+### Second user
+
+![User2](https://cdn.discordapp.com/attachments/1057322303731548192/1156282688626503690/image.png?ex=651467ab&is=6513162b&hm=f7913c63808a2791df28f49725ef2f0d85a3e24cf3b948a69f2083c0b5c71c83&)
+
+</details>
+
+<details>
+
+<summary>Connect Item model with User</summary>
+
+1. Add user field to model
+
+    ```py
+    # main/models.py
+
+    class Product(models.Model):
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+        # ...
+    ```
+2. Modify the ```create_product``` view to add the user to the product entity
+
+    ```py
+    # main/views.py
+
+    # ...
+    def create_product(request):
+        form = ProductForm(request.POST or None)
+
+        if form.is_valid() and request.method == 'POST':
+            product = form.save(commit=False)
+            product.user = request.user
+            product.save()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        
+        context = {'form': form}
+        return render(request, 'create_product.html', context)
+    # ...
+    ```
+3. Change the context of the ```show_main``` view to display the username
+
+    ```py
+    context = {
+        'name': request.user.username,
+        # ...
+    }
+    ```
+
+</details>
+
+<details>
+
+<summary>Display the information of the logged-in user and applying cookies</summary>
+
+1. Add a ```last_login``` cookie when user logs in
+
+    ```py
+    # main/views.py
+
+    # ...
+    def login_user(request):
+        if request.method == 'POST':
+            # ...
+            if user is not None:
+                login(request, user)
+                response = HttpResponseRedirect(reverse("main:show_main")) 
+                response.set_cookie('last_login', str(datetime.datetime.now()))
+            # ...
+    # ...
+    ```
+
+2. Add the ```last_login``` cookie to the ```show_main``` context
+
+    ```py
+    # main/views.py
+
+    # ...
+    context = {
+        # ...
+        'last_login': request.COOKIES['last_login'],
+        # ...
+    }
+    # ...
+    ```
+
+3. Add the ```last_login``` to the HTML template
+
+    ```html
+    <!-- main/templates/main.html -->
+    
+    <!-- ... -->
+    <h5>Last login session: {{ last_login }}</h5>
+    <!-- ... -->
+    ```
+
+</details>
+
+<details>
+
+<summary>Implementing authorization</summary>
+
+1. Add ```@login_required(login_url='/login')``` to views that needs a login
+
+    ```py
+    # main/views.py
+
+    @login_required(login_url='/login')
+        def show_main(request):
+
+    @login_required(login_url='/login')
+        def create_product(request):
+
+    @login_required(login_url='/login')
+        def delete_product(request, id):
+
+    @login_required(login_url='/login')
+        def show_products(request):
+
+    @login_required(login_url='/login')
+        def show_xml(request):
+
+    @login_required(login_url='/login')
+        def show_json(request):
+    
+    @login_required(login_url='/login')
+        def show_xml_by_id(request, id):
+    
+    @login_required(login_url='/login')
+        def show_json_by_id(request, id):
+    
+    ```
+
+2. Add checks to make sure user is modifying and showing their own products
+
+    ```py
+    @login_required(login_url='/login')
+    def delete_product(request, id):
+        try:
+            product = Product.objects.get(pk=id)
+            if product.user.id != request.user.id:
+                return HttpResponse(status=403)
+            # ...
+        # ...
+    
+    @login_required(login_url='/login')
+    def show_products(request):
+        products = Product.objects.filter(user=request.user)
+        # ...
+    
+    @login_required(login_url='/login')
+    def show_xml(request):
+        products = Product.objects.filter(user=request.user)
+        # ...
+    
+    @login_required(login_url='/login')
+    def show_json(request):
+        products = Product.objects.filter(user=request.user)
+        # ...
+    
+    @login_required(login_url='/login')
+    def show_xml_by_id(request, id):
+        product = Product.objects.filter(pk=id)
+        if product.first().user.id != request.user.id:
+            return HttpResponse(status=403)
+        # ...
+    
+    @login_required(login_url='/login')
+    def show_json_by_id(request, id):
+        product = Product.objects.filter(pk=id)
+        if product.first().user.id != request.user.id:
+                return HttpResponse(status=403)
+        # ...
+    ```
+
+</details>
+
+<details>
+
+<summary>Add a button to increment the amount of an item and a button to decrement the amount of an item</summary>
+
+1. Create the views to increment and decrement the amount of an item
+
+    ```py
+    # main/views.py
+
+    # ...
+    @login_required(login_url='/login')
+    def increment_amount(request, id):
+        product = Product.objects.get(pk=id)
+        if request.user.id == product.user.id:
+            product.amount += 1
+            product.save()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        else:
+            return HttpResponse(status=403)
+
+    @login_required(login_url='/login')
+    def decrement_amount(request, id):
+        product = Product.objects.get(pk=id)
+        if request.user.id == product.user.id:
+            product.amount -= 1
+            product.save()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        else:
+            return HttpResponse(status=403)
+    ```
+
+2. Add the buttons to the HTML template
+
+    ```html
+    <!-- main/templates/product_table.html -->
+
+    <!-- ... -->
+    <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 2em; padding-right: 2em; border: 1px solid; border-collapse: collapse;">
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <form method="post" action="/products/decrement/{{product.id}}/">
+                {% csrf_token %}
+                <button>-</button>
+            </form>
+            {{product.amount}}
+            <form method="post" action="/products/increment/{{product.id}}/">
+                {% csrf_token %}
+                <button>+</button>
+            </form>
+        </div>
+    </td>
+    <!-- ... -->
+    ```
+
+3. Route the create views
+
+    ```py
+    # main/urls.py
+
+    urlpatterns = [
+        # ...
+        path('products/increment/<int:id>/', increment_amount, name='increment_amount'),
+        path('products/decrement/<int:id>/', decrement_amount, name='decrement_amount'),
+        # ...
+    ]
+    
+    ```
+
+</details>
+
+<details>
+
+<summary>Add a button to delete an item from the inventory</summary>
+
+1. Create the view to delete an item
+
+    ```py
+    # main/views.py
+    
+    # ...
+    @login_required(login_url='/login')
+    def delete_product(request, id):
+        try:
+            product = Product.objects.get(pk=id)
+            if product.user.id != request.user.id:
+                return HttpResponse(status=403)
+            product.delete()
+            return HttpResponseRedirect(reverse('main:show_main'))
+        except Product.DoesNotExist:
+            return HttpResponse(status=204)
+    # ...
+    ```
+
+2. Add the delete button in the HTML template
+
+    ```html
+    <!-- main/templates/product_table.html -->
+    <!-- ... -->
+    <td style="padding-top: 0.25em; padding-bottom: 0.25em; padding-left: 1em; padding-right: 1em; border: 1px solid; border-collapse: collapse;">
+        <form method="post" action="/products/delete/{{product.id}}/">
+            {% csrf_token %}
+            <button>X</button>
+        </form>
+    </td>
+    <!-- ... -->
+    ```
+
+3. Route the created view
+
+    ```py
+    # main/urls.py
+
+    urlpatterns = [
+        # ...
+        path('products/delete/<int:id>/', delete_product, name='delete_product'),
+        # ...
+    ]
+    
+    ```
+
+</details>
+
+## Assignment Essay
+
+<details>
+
+<summary>Assignment 2</summary>
+
 ## Django Web App Diagram
 ![Django Diagram](https://cdn.discordapp.com/attachments/1057322303731548192/1150633658449924136/django.png)
 
@@ -497,6 +967,12 @@ The purpose of virtual environments are to help isolate the Python version and t
 **MVT** stands for **Model-View-Template**. The model and View are the same with MVC. But the big difference between MVT and MVC is, MVT use a template to define the user interface.
 
 **MVVM** stands for **Model-View-ViewModel**. The model and view are the same as the other two. The ViewModel acts as a 'converter' to convert the models to a view that can be rendered to the user.
+
+</details>
+
+<details>
+
+<summary>Assignment 3</summary>
 
 ## POST vs GET
 
@@ -526,3 +1002,25 @@ JSON is more common because it's more human-readable and more simple than XML. J
 
 ### GET /products/json/5
 ![GET /products/json/5](https://cdn.discordapp.com/attachments/1057322303731548192/1152510530016268318/image.png)
+
+</details>
+
+<details>
+
+<summary>Assignment 4</summary>
+
+## UserCreationForm
+
+```UserCreationForm``` is one of the built-in forms in Django that aids in creating users. It has many features, including password strength, password confirmation, checking if password is similiar to the username, and other.
+
+The main advantage of ```UserCreationForm``` is it is plug and play, you just import the form and you can use them immediately. And one other advantage is you don't need to implement the security features. But one of the disadvantages are the form itself is not very customizable.
+
+## Authentication vs Authorization
+
+Authentication is an act of proving if someone is who they are. Authorization is an act of proving if someone has access to something. Both is needed in an application. Because if we don't have authentication, our authorization is useless because anyone can be any user. If we don't have authorization, someone can access something that they should not have access to.
+## Cookies
+
+Cookies are datas that is generated by a website that is stored in the client's browser. Cookies are most commonly used to identify a user. Django uses a session id to identify a user that is accessing the website.
+
+Cookies itself is secure. But if not used correctly, it can pose security issues. Actors could impersonate a user or collect sensitive data from the user.
+</details>
