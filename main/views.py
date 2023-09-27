@@ -148,8 +148,11 @@ def increment_amount(request, id):
 def decrement_amount(request, id):
     product = Product.objects.get(pk=id)
     if request.user.id == product.user.id:
-        product.amount -= 1
-        product.save()
+        if product.amount != 1:
+            product.amount -= 1
+            product.save()
+        else:
+            product.delete()
         return HttpResponseRedirect(reverse('main:show_main'))
     else:
         return HttpResponse(status=403)
