@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-{% include 'product_table.html' %}
+<div class="h-screen flex flex-col justify-center items-center gap-8">
+    <h1 class="text-3xl font-bold">Product Table</h1>
+    {% include 'product_table.html' %}
+</div>
 {% endblock content %}

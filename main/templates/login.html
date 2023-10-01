@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="h-screen grid grid-cols-2 justify-center items-center">
-    <div class="min-h-screen flex justify-end items-center p-16 bg-cyan-500">
+    <div class="min-h-screen flex justify-end items-center p-8 bg-cyan-500 rounded-r-[2rem]">
         <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
     </div>
-    <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+    <div class="min-h-screen flex justify-center items-start flex-col p-8 gap-8">
         <form method="POST" action="/login/">
             {% csrf_token %}
             <div class="flex flex-col gap-4 items-center">

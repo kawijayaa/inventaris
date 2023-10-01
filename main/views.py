@@ -71,6 +71,7 @@ def show_products(request):
         'products': products,
         'product_count': product_count,
         'plural': 's' if product_count != 1 else '',
+        'last_product': products.last(),
     }
 
     return render(request, 'show_products.html', context)

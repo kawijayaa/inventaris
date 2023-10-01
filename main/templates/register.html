@@ -2,7 +2,7 @@
 
 {% block content %}  
 <div class="h-screen grid grid-cols-2 justify-center items-center">
-    <div class="min-h-screen flex justify-end items-center p-16 gap-4 bg-cyan-500">
+    <div class="min-h-screen flex justify-end items-center p-8 gap-4 bg-cyan-500 rounded-r-[2rem]">
         <a href="/">
             <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -10,7 +10,7 @@
         </a>
         <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
     </div>
-    <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+    <div class="min-h-screen flex justify-center items-start flex-col p-8 gap-8">
         <p class="text-2xl font-semibold">Register New User</p>
         <form method="POST" action="/register/">
             {% csrf_token %}
