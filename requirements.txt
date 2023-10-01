@@ -1,4 +1,5 @@
 django
+django-tailwind
 gunicorn
 whitenoise
 psycopg2-binary

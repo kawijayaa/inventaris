@@ -1,0 +1,24 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+{% include 'navbar.html' %}
+<div class="flex flex-col justify-center items-center gap-8 p-8">
+    <h1 class="text-2xl font-semibold">Edit Product</h1>
+    <form method="POST" class="w-max flex flex-col gap-8">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4 items-center">
+            <label for="id_name">Name:</label>
+            <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.name}}"></input>
+            <label for="id_amount">Amount:</label>
+            <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]"  value="{{form.instance.amount}}">
+            <label for="id_amount">Description:</label>
+            <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">{{form.instance.description}}</textarea>
+            <label for="id_category">Category:</label>
+            <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.category}}">
+            <label for="id_price">Price:</label>
+            <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.price}}">
+        </div>
+        <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Edit">
+    </form>
+</div>
+{% endblock content %}

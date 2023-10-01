@@ -20,13 +20,17 @@ def show_main(request):
     products = Product.objects.filter(user=request.user)
     product_count = products.count()
 
+    if 'last_login' not in request.COOKIES:
+        logout(request)
+
     context = {
         'name': request.user.username,
         'class': 'PBP KKI',
         'products': products,
         'product_count': product_count,
         'plural': 's' if product_count != 1 else '',
-        'last_login': request.COOKIES['last_login'],
+        'last_login': datetime.datetime.strptime(request.COOKIES['last_login'], '%Y-%m-%d %H:%M:%S.%f'),
+        'last_product': products.last(),
     }
 
     return render(request, 'main.html', context)
@@ -41,7 +45,10 @@ def create_product(request):
         product.save()
         return HttpResponseRedirect(reverse('main:show_main'))
     
-    context = {'form': form}
+    context = {
+        'form': form,
+        'last_login': datetime.datetime.strptime(request.COOKIES['last_login'], '%Y-%m-%d %H:%M:%S.%f'),
+    }
     return render(request, 'create_product.html', context)
 
 @login_required(login_url='/login')
@@ -156,3 +163,21 @@ def decrement_amount(request, id):
         return HttpResponseRedirect(reverse('main:show_main'))
     else:
         return HttpResponse(status=403)
+
+@login_required(login_url='/login')
+def edit_product(request, id):
+    # Get product by ID
+    product = Product.objects.get(pk=id)
+    if request.user.id == product.user.id:
+        # Set product as instance of form
+        form = ProductForm(request.POST or None, instance=product)
+
+        if form.is_valid() and request.method == "POST":
+            # Save the form and return to home page
+            form.save()
+            return HttpResponseRedirect(reverse('main:show_main'))
+    else:
+        return HttpResponse(status=403)
+
+    context = {'form': form}
+    return render(request, "edit_product.html", context)

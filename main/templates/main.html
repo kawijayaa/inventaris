@@ -1,25 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 style="font-weight: 900; font-size: 3em;">INVENTARIS</h1>
-<div style="display: flex; gap: 1em;">
-    <h3>Name: {{name}}</h3>
-    <h3>Class: {{class}}</h3>
+{% include 'navbar.html' %}
+<div class="flex justify-center p-8">
+    {% include 'product_table.html' %}
 </div>
-
-{% include 'product_table.html' %}
-
-<a href="{% url 'main:create_product' %}">
-    <button>
-        Add New Product
-    </button>
-</a>
-
-<h5>Last login session: {{ last_login }}</h5>
-
-<a href="{% url 'main:logout' %}">
-    <button>
-        Logout
-    </button>
-</a>
 {% endblock content %}

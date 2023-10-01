@@ -1,4 +1,5 @@
 {% load static %}
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -10,11 +11,13 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+        <title>INVENTARIS</title>
+        {% tailwind_css %}
         {% block meta %}
         {% endblock meta %}
     </head>
 
-    <body style="display: flex; align-items: center; flex-direction: column; font-family: 'Roboto', sans-serif;">
+    <body style="font-family: 'Roboto', sans-serif;" class="bg-neutral-800 text-white">
         {% block content %}
         {% endblock content %}
     </body>

@@ -1,41 +1,41 @@
 {% extends 'base.html' %}
 
-{% block meta %}
-    <title>Login</title>
-{% endblock meta %}
-
 {% block content %}
-
-<h1 style="font-weight: 900; font-size: 3em;">INVENTARIS</h1>
-
-<form method="POST" action="">
-    {% csrf_token %}
-    <table>
-        <tr>
-            <td>Username: </td>
-            <td><input type="text" name="username" placeholder="Username" class="form-control"></td>
-        </tr>
-                
-        <tr>
-            <td>Password: </td>
-            <td><input type="password" name="password" placeholder="Password" class="form-control"></td>
-        </tr>
-
-        <tr>
-            <td></td>
-            <td><input class="btn login_btn" type="submit" value="Login"></td>
-        </tr>
-    </table>
-</form>
-
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}     
+<div class="h-screen grid grid-cols-2 justify-center items-center">
+    <div class="min-h-screen flex justify-end items-center p-16 bg-cyan-500">
+        <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
+    </div>
+    <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+        <form method="POST" action="/login/">
+            {% csrf_token %}
+            <div class="flex flex-col gap-4 items-center">
+                <div class="grid grid-row-2 gap-4">
+                    <div class="flex justify-center items-center gap-4">
+                        <label for="username" class="text-xl">Username:</label>
+                        <input type="text" name="username" placeholder="Username" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                    </div>
+                    <div class="flex justify-center items-center gap-4">
+                        <label for="password" class="text-xl">Password:</label>
+                        <input type="password" name="password" placeholder="Password" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                    </div>
+                </div>
+                <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Login">
+            </div>
+        </form>
     
-Don't have an account yet? <a href="{% url 'main:register' %}">Register Now</a>
-
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        <li class="text-green-500 font-semibold text-lg">{{ message }}</li>
+                    {% else %}
+                        <li class="text-red-500 font-semibold text-lg">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}     
+            
+        <p class="text-lg">Don't have an account yet? <a href="{% url 'main:register' %}" class="hover:text-cyan-500 transition-colors">Register Now</a></p>
+    </div>
+</div>
 {% endblock content %}

@@ -1,28 +1,60 @@
 {% extends 'base.html' %}
 
-{% block meta %}
-    <title>Register</title>
-{% endblock meta %}
-
 {% block content %}  
-<h1>Register</h1>  
-
-    <form method="POST" >  
-        {% csrf_token %}  
-        <table>  
-            {{ form.as_table }}  
-            <tr>  
-                <td></td>
-                <td><input type="submit" name="submit" value="Daftar"/></td>  
-            </tr>  
-        </table>  
-    </form>
-
-{% if messages %}  
-    <ul>   
-        {% for message in messages %}  
-            <li>{{ message }}</li>  
-            {% endfor %}  
-    </ul>   
-{% endif %}
+<div class="h-screen grid grid-cols-2 justify-center items-center">
+    <div class="min-h-screen flex justify-end items-center p-16 gap-4 bg-cyan-500">
+        <a href="/">
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            </svg>
+        </a>
+        <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
+    </div>
+    <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+        <p class="text-2xl font-semibold">Register New User</p>
+        <form method="POST" action="/register/">
+            {% csrf_token %}
+            <div class="flex flex-col gap-4">
+                <div class="grid grid-row-2 gap-4">
+                    <div class="flex justify-between items-center gap-4">
+                        <label for="username" class="text-xl">Username:</label>
+                        <input type="text" name="username" placeholder="Username" maxlength="150" autocapitalize="none" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <label for="password" class="text-xl">Password:</label>
+                        <input type="password" name="password1" placeholder="Password" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <label for="password" class="text-xl">Password Confirmation:</label>
+                        <input type="password" name="password2" placeholder="Password Confirmation" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                    </div>
+                </div>
+                <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Register">
+            </div>
+        </form>
+    
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="text-red-500 font-semibold text-lg">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}     
+        {% if form.errors.username %}
+            <ul>
+                <li class="text-red-500 font-semibold text-lg">{{ form.errors.username }}</li>
+            </ul>
+        {% endif %}        
+        {% if form.errors.password1 %}
+            <ul>
+                <li class="text-red-500 font-semibold text-lg">{{ form.errors.password1 }}</li>
+            </ul>
+        {% endif %}        
+        {% if form.errors.password2 %}
+            <ul>
+                <li class="text-red-500 font-semibold text-lg">{{ form.errors.password2 }}</li>
+            </ul>
+        {% endif %}        
+    </div>
+</div>
 {% endblock content %}

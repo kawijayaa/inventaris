@@ -939,6 +939,461 @@
 
 </details>
 
+### Assignment 5
+
+<details>
+
+<summary>Install Tailwind</summary>
+
+1. Install django-tailwind package
+
+    ```bash
+    pip install django-tailwind
+    ```
+
+2. Add tailwind to INSTALLED_APPS
+
+    ```py
+    # inventaris/settings.py
+
+    INSTALLED_APPS = [
+        # ...
+        'tailwind',
+    ]
+    ```
+
+3. Initialize tailwind app
+
+    ```bash
+    python manage.py tailwind init
+    ```
+
+4. Add the created app to INSTALLED_APPS
+
+    ```py
+    # inventaris/settings.py
+
+    INSTALLED_APPS = [
+        # ...
+        'tailwind',
+        'theme',
+    ]
+    ```
+
+5. Add new variables for tailwind in settings.py
+
+    ```py
+    # inventaris/settings.py
+
+    TAILWIND_APP_NAME = 'theme'
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
+    
+    ```
+
+7. Install tailwind
+
+    ```bash
+    python manage.py tailwind install
+    ```
+
+8. Add tailwind to the base template
+
+    ```html
+    <!-- templates/base.html -->
+
+    {% load static %}
+    {% load static tailwind_tags %}
+    <html>
+        <head>
+            <!-- ... -->
+            {% tailwind_css %}
+            <!-- ... -->
+        </head>
+        <!-- ... -->
+    </html>
+
+    ```
+
+9. Start tailwind
+
+    ```bash
+    python manage.py tailwind start
+    ```
+
+</details>
+
+<details>
+
+<summary>Modify templates to use Tailwind</summary>
+
+1. Create a new navbar
+
+    ```html
+    <!-- main/templates/navbar.html -->
+
+    {% block content %}
+    <div class="min-w-full flex justify-between px-8 py-4 bg-cyan-500">
+        <div class="flex items-center gap-4">
+            <a href="/" class="text-4xl font-black">INVENTARIS</a>
+            <a href="{% url 'main:create_product' %}" class="text-4xl hover:text-green-400 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+            </a>
+        </div>
+        <div class="flex flex-col items-end text-right">
+            <p class="text-2xl leading-snug">Welcome, <span class="font-bold">{{ user.username }}</span> (PBP KKI)</p>
+            <p class="text-lg leading-snug">Last login: {{ last_login }}</p>
+            <a href="{% url 'main:logout' %}" class=" hover:text-red-500 hover:font-semibold transition-all w-max leading-snug">Logout</a>
+        </div>
+    </div>
+    {% endblock %}
+    ```
+
+2. Modify product_table template
+
+    ```html
+    <!-- main/templates/product_table.html -->
+    
+    {% block content %}
+    <div class="flex flex-col justify-center items-center gap-6">
+        <table>
+            <tr class="bg-neutral-500 border border-neutral-300 text-center">
+                <th class="px-12 py-2">Name</th>
+                <th class="px-12 py-2">Amount</th>
+                <th class="px-12 py-2">Description</th>
+                <th class="px-12 py-2">Category</th>
+                <th class="px-12 py-2">Price</th>
+                <th class="px-12 py-2">Date Added</th>
+                <th></th>
+            </tr>
+            {% for product in products %}
+            <tr class="border border-neutral-300 {% if product == last_product %} bg-cyan-700 {% else %} bg-neutral-700 {% endif %} text-white text-center">
+                <td class="px-12 py-2">{{product.name}}</td>
+                <td class="px-12 py-2">
+                    <div class="flex justify-center items-center gap-4">
+                        <form method="post" action="/products/decrement/{{product.id}}/">
+                            {% csrf_token %}
+                            <button class="p-[2px] text-lg hover:text-green-400 transition-colors">-</button>
+                        </form>
+                        {{product.amount}}
+                        <form method="post" action="/products/increment/{{product.id}}/">
+                            {% csrf_token %}
+                            <button class="p-[2px] text-lg hover:text-green-400 transition-colors">+</button>
+                        </form>
+                    </div>
+                </td>
+                <td class="px-12 py-2">{{product.description}}</td>
+                <td class="px-12 py-2">{{product.category}}</td>
+                <td class="px-12 py-2">{{product.price}}</td>
+                <td class="px-12 py-2">{{product.date_added}}</td>
+                <td class="px-12 py-2">
+                    <div class="flex gap-2">
+                        <form method="post" action="/products/edit/{{product.id}}/" class="flex justify-center items-center">
+                            {% csrf_token %}
+                            <button class="hover:text-green-400 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                </svg>
+                            </button>
+                        </form>
+                        <form method="post" action="/products/delete/{{product.id}}/" class="flex justify-center items-center">
+                            {% csrf_token %}
+                            <button class="hover:text-red-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>Total products: {{product_count}} product{{plural}}</p>
+    </div>
+    {% endblock content %}
+    ```
+
+3. Modify the login template
+
+    ```html
+    <!-- main/templates/login.html -->
+    
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <div class="h-screen grid grid-cols-2 justify-center items-center">
+        <div class="min-h-screen flex justify-end items-center p-16 bg-cyan-500">
+            <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
+        </div>
+        <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+            <form method="POST" action="/login/">
+                {% csrf_token %}
+                <div class="flex flex-col gap-4 items-center">
+                    <div class="grid grid-row-2 gap-4">
+                        <div class="flex justify-center items-center gap-4">
+                            <label for="username" class="text-xl">Username:</label>
+                            <input type="text" name="username" placeholder="Username" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                        </div>
+                        <div class="flex justify-center items-center gap-4">
+                            <label for="password" class="text-xl">Password:</label>
+                            <input type="password" name="password" placeholder="Password" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                        </div>
+                    </div>
+                    <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Login">
+                </div>
+            </form>
+        
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <li class="text-green-500 font-semibold text-lg">{{ message }}</li>
+                        {% else %}
+                            <li class="text-red-500 font-semibold text-lg">{{ message }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}     
+                
+            <p class="text-lg">Don't have an account yet? <a href="{% url 'main:register' %}" class="hover:text-cyan-500 transition-colors">Register Now</a></p>
+        </div>
+    </div>
+    {% endblock content %}
+    ```
+
+4. Modify the register template
+
+    ```html
+    <!-- main/templates/register.html -->
+    
+    {% extends 'base.html' %}
+
+    {% block content %}  
+    <div class="h-screen grid grid-cols-2 justify-center items-center">
+        <div class="min-h-screen flex justify-end items-center p-16 gap-4 bg-cyan-500">
+            <a href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+            </a>
+            <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
+        </div>
+        <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+            <p class="text-2xl font-semibold">Register New User</p>
+            <form method="POST" action="/register/">
+                {% csrf_token %}
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-row-2 gap-4">
+                        <div class="flex justify-between items-center gap-4">
+                            <label for="username" class="text-xl">Username:</label>
+                            <input type="text" name="username" placeholder="Username" maxlength="150" autocapitalize="none" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                        </div>
+                        <div class="flex justify-between items-center gap-4">
+                            <label for="password" class="text-xl">Password:</label>
+                            <input type="password" name="password1" placeholder="Password" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                        </div>
+                        <div class="flex justify-between items-center gap-4">
+                            <label for="password" class="text-xl">Password Confirmation:</label>
+                            <input type="password" name="password2" placeholder="Password Confirmation" required class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                        </div>
+                    </div>
+                    <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Register">
+                </div>
+            </form>
+        
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li class="text-red-500 font-semibold text-lg">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}     
+            {% if form.errors.username %}
+                <ul>
+                    <li class="text-red-500 font-semibold text-lg">{{ form.errors.username }}</li>
+                </ul>
+            {% endif %}        
+            {% if form.errors.password1 %}
+                <ul>
+                    <li class="text-red-500 font-semibold text-lg">{{ form.errors.password1 }}</li>
+                </ul>
+            {% endif %}        
+            {% if form.errors.password2 %}
+                <ul>
+                    <li class="text-red-500 font-semibold text-lg">{{ form.errors.password2 }}</li>
+                </ul>
+            {% endif %}        
+        </div>
+    </div>
+    {% endblock content %}
+    ```
+
+5. Modify the create_product template
+
+    ```html
+    <!-- main/templates/create_product.html -->
+    
+    {% extends 'base.html' %} 
+
+    {% block content %}
+    {% include 'navbar.html' %}
+    <div class="flex flex-col justify-center items-center gap-8 p-8">
+        <h1 class="text-2xl font-semibold">Create New Product</h1>
+        <form method="POST" class="w-max flex flex-col gap-8">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4 items-center">
+                <label for="id_name">Name:</label>
+                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                <label for="id_amount">Amount:</label>
+                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                <label for="id_amount">Description:</label>
+                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]"></textarea>
+                <label for="id_category">Category:</label>
+                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+                <label for="id_price">Price:</label>
+                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+            </div>
+            <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Create">
+        </form>
+    </div>
+    {% endblock content %}
+    ```
+
+</details>
+
+<details>
+
+<summary>Create edit function</summary>
+
+1. Create the view to edit products
+
+    ```py
+    # main/views.py
+
+    # ...
+    @login_required(login_url='/login')
+    def edit_product(request, id):
+        # Get product by ID
+        product = Product.objects.get(pk=id)
+        if request.user.id == product.user.id:
+            # Set product as instance of form
+            form = ProductForm(request.POST or None, instance=product)
+
+            if form.is_valid() and request.method == "POST":
+                # Save the form and return to home page
+                form.save()
+                return HttpResponseRedirect(reverse('main:show_main'))
+        else:
+            return HttpResponse(status=403)
+
+        context = {'form': form}
+        return render(request, "edit_product.html", context)
+    # ...
+    ```
+
+2. Create a template for the view
+
+    ```html
+    <!-- main/templates/edit_product.html -->
+    
+    {% extends 'base.html' %} 
+
+    {% block content %}
+    {% include 'navbar.html' %}
+    <div class="flex flex-col justify-center items-center gap-8 p-8">
+        <h1 class="text-2xl font-semibold">Edit Product</h1>
+        <form method="POST" class="w-max flex flex-col gap-8">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4 items-center">
+                <label for="id_name">Name:</label>
+                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.name}}"></input>
+                <label for="id_amount">Amount:</label>
+                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]"  value="{{form.instance.amount}}">
+                <label for="id_amount">Description:</label>
+                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">{{form.instance.description}}</textarea>
+                <label for="id_category">Category:</label>
+                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.category}}">
+                <label for="id_price">Price:</label>
+                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.price}}">
+            </div>
+            <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Edit">
+        </form>
+    </div>
+    {% endblock content %}
+    ```
+
+3. Add routings for the edit_product view
+
+    ```py
+    # main/urls.py
+
+    urlpatterns = [
+        # ...
+        path('products/edit/<int:id>/', edit_product, name='edit_product'),
+        # ...
+    ]
+    ```
+
+4. Add the edit button on the product_table template
+
+    ```html
+    <!-- main/templates/product_table.html -->
+
+    <form method="post" action="/products/edit/{{product.id}}/" class="flex justify-center items-center">
+        {% csrf_token %}
+        <button class="hover:text-green-400 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+            </svg>
+        </button>
+    </form>
+    ```
+
+</details>
+
+<details>
+
+<summary>Add functionality to highlight the last product</summary>
+
+1. Add last_product context to show_main view
+
+    ```py
+    # main/views.py
+
+    # ...
+    @login_required(login_url='/login')
+    def show_main(request):
+        # ...
+        context = {
+            # ...
+            'last_product': products.last(),
+            # ...
+        }
+    # ...
+    ```
+
+2. Add if condition on the class of the table row
+
+    ```html
+    <!-- main/templates/product_table.html -->
+    
+    <!-- ... -->
+    {% for product in products %}
+        <tr class="border border-neutral-300 {% if product == last_product %} bg-cyan-700 {% else %} bg-neutral-700 {% endif %} text-white text-center">
+            <!-- ... -->
+        <!-- ... -->
+    <!-- ... -->
+    ```
+
+</details>
+
 ## Assignment Essay
 
 <details>
@@ -1026,4 +1481,30 @@ Authentication is an act of proving if someone is who they are. Authorization is
 Cookies are datas that is generated by a website that is stored in the client's browser. Cookies are most commonly used to identify a user. Django uses a session id to identify a user that is accessing the website.
 
 Cookies itself is secure. But if not used correctly, it can pose security issues. Actors could impersonate a user or collect sensitive data from the user.
+</details>
+
+<details>
+
+<summary>Assignment 5</summary>
+
+### CSS Element Selector
+
+The ```.``` selector is used for selecting classes. The ```#``` selector is used to select id. You can also select any HTML tags (e.g. ```p``` or ```h1```). You can group elements that needs the same CSS (e.g. ```p, h1, h2```). You can select all elements using the ```*``` selector.
+
+### HTML5 Tags
+
+1. ```<audio>```: To embed an audio file
+2. ```<nav>```: Represents a navigation bar/links
+3. ```<main>```: Represents the main or dominant section of a document
+
+### Margin vs Padding
+
+Margin defines the amount of space outside of the element, padding defines the amount of space surrounding inside the element.
+
+### Tailwind vs Bootstrap
+
+One of the pros of Tailwind is its flexibility and freedom, which supports unique designs from the developers. Bootstrap offers a "ready-made" feel to the website, so it's not as customizable as Tailwind.
+
+Bootstrap can be used if the developer does not want to design a website from scratch. Tailwind can be used if the developer wants more freedom designing the website.
+
 </details>
