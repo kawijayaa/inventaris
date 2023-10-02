@@ -1034,7 +1034,7 @@
     <!-- main/templates/navbar.html -->
 
     {% block content %}
-    <div class="min-w-full flex justify-between px-8 py-4 bg-cyan-500">
+    <div class="flex justify-between px-8 py-4 bg-cyan-500 rounded-b-[2rem]">
         <div class="flex items-center gap-4">
             <a href="/" class="text-4xl font-black">INVENTARIS</a>
             <a href="{% url 'main:create_product' %}" class="text-4xl hover:text-green-400 transition-colors">
@@ -1061,18 +1061,18 @@
     {% block content %}
     <div class="flex flex-col justify-center items-center gap-6">
         <table>
-            <tr class="bg-neutral-500 border border-neutral-300 text-center">
-                <th class="px-12 py-2">Name</th>
+            <tr class="bg-neutral-500 text-center">
+                <th class="px-12 py-2 rounded-tl-xl">Name</th>
                 <th class="px-12 py-2">Amount</th>
                 <th class="px-12 py-2">Description</th>
                 <th class="px-12 py-2">Category</th>
                 <th class="px-12 py-2">Price</th>
                 <th class="px-12 py-2">Date Added</th>
-                <th></th>
+                <th class="rounded-tr-xl"></th>
             </tr>
             {% for product in products %}
-            <tr class="border border-neutral-300 {% if product == last_product %} bg-cyan-700 {% else %} bg-neutral-700 {% endif %} text-white text-center">
-                <td class="px-12 py-2">{{product.name}}</td>
+            <tr class="{% if product == last_product %} bg-cyan-700 {% else %} bg-neutral-700 {% endif %} text-white text-center">
+                <td class="px-12 py-2 {% if product == last_product %} rounded-bl-xl {% endif %}">{{product.name}}</td>
                 <td class="px-12 py-2">
                     <div class="flex justify-center items-center gap-4">
                         <form method="post" action="/products/decrement/{{product.id}}/">
@@ -1090,7 +1090,7 @@
                 <td class="px-12 py-2">{{product.category}}</td>
                 <td class="px-12 py-2">{{product.price}}</td>
                 <td class="px-12 py-2">{{product.date_added}}</td>
-                <td class="px-12 py-2">
+                <td class="px-12 py-2 {% if product == last_product %} rounded-br-xl {% endif %}">
                     <div class="flex gap-2">
                         <form method="post" action="/products/edit/{{product.id}}/" class="flex justify-center items-center">
                             {% csrf_token %}
@@ -1128,10 +1128,10 @@
 
     {% block content %}
     <div class="h-screen grid grid-cols-2 justify-center items-center">
-        <div class="min-h-screen flex justify-end items-center p-16 bg-cyan-500">
+        <div class="min-h-screen flex justify-end items-center p-8 bg-cyan-500 rounded-r-[2rem]">
             <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
         </div>
-        <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+        <div class="min-h-screen flex justify-center items-start flex-col p-8 gap-8">
             <form method="POST" action="/login/">
                 {% csrf_token %}
                 <div class="flex flex-col gap-4 items-center">
@@ -1176,7 +1176,7 @@
 
     {% block content %}  
     <div class="h-screen grid grid-cols-2 justify-center items-center">
-        <div class="min-h-screen flex justify-end items-center p-16 gap-4 bg-cyan-500">
+        <div class="min-h-screen flex justify-end items-center p-8 gap-4 bg-cyan-500 rounded-r-[2rem]">
             <a href="/">
                 <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -1184,7 +1184,7 @@
             </a>
             <h1 class="font-black text-white text-5xl">INVENTARIS</h1>
         </div>
-        <div class="min-h-screen flex justify-center items-start flex-col p-16 gap-8">
+        <div class="min-h-screen flex justify-center items-start flex-col p-8 gap-8">
             <p class="text-2xl font-semibold">Register New User</p>
             <form method="POST" action="/register/">
                 {% csrf_token %}
@@ -1247,20 +1247,35 @@
         <h1 class="text-2xl font-semibold">Create New Product</h1>
         <form method="POST" class="w-max flex flex-col gap-8">
             {% csrf_token %}
-            <div class="grid grid-cols-2 gap-4 items-center">
-                <label for="id_name">Name:</label>
-                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
-                <label for="id_amount">Amount:</label>
-                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
-                <label for="id_amount">Description:</label>
-                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]"></textarea>
-                <label for="id_category">Category:</label>
-                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
-                <label for="id_price">Price:</label>
-                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <label for="id_name" class="col-span-1">Name:</label>
+                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                <label for="id_amount" class="col-span-1">Amount:</label>
+                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                <label for="id_description" class="col-span-1">Description:</label>
+                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3"></textarea>
+                <label for="id_category" class="col-span-1">Category:</label>
+                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                <label for="id_price" class="col-span-1">Price:</label>
+                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
             </div>
             <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Create">
         </form>
+    </div>
+    {% endblock content %}
+    ```
+
+6. Add the navbar to the main template
+
+    ```html
+    <!-- main/templates/main.html -->
+    
+    {% extends 'base.html' %}
+
+    {% block content %}
+    {% include 'navbar.html' %}
+    <div class="flex justify-center p-8">
+        {% include 'product_table.html' %}
     </div>
     {% endblock content %}
     ```
@@ -1310,17 +1325,17 @@
         <h1 class="text-2xl font-semibold">Edit Product</h1>
         <form method="POST" class="w-max flex flex-col gap-8">
             {% csrf_token %}
-            <div class="grid grid-cols-2 gap-4 items-center">
-                <label for="id_name">Name:</label>
-                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.name}}"></input>
-                <label for="id_amount">Amount:</label>
-                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]"  value="{{form.instance.amount}}">
-                <label for="id_amount">Description:</label>
-                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]">{{form.instance.description}}</textarea>
-                <label for="id_category">Category:</label>
-                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.category}}">
-                <label for="id_price">Price:</label>
-                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline]" value="{{form.instance.price}}">
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <label for="id_name" class="col-span-1">Name:</label>
+                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3" value="{{form.instance.name}}"></input>
+                <label for="id_amount" class="col-span-1">Amount:</label>
+                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3"  value="{{form.instance.amount}}">
+                <label for="id_description" class="col-span-1">Description:</label>
+                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">{{form.instance.description}}</textarea>
+                <label for="id_category" class="col-span-1">Category:</label>
+                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3" value="{{form.instance.category}}">
+                <label for="id_price" class="col-span-1">Price:</label>
+                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3" value="{{form.instance.price}}">
             </div>
             <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Edit">
         </form>
@@ -1392,6 +1407,47 @@
     <!-- ... -->
     ```
 
+</details>
+
+<details>
+
+<summary>Add favicon</summary>
+
+1. Create a folder in root with name static
+
+    ```bash
+    mkdir static
+    ```
+
+2. Put favicon.ico to the static folder
+
+3. Initialize static folder in settings.py
+
+    ```py
+    # inventaris/settings.py
+    
+    # ...
+    STATIC_URL = 'static/'
+    STATICFILES_DIRS = [BASE_DIR / "static"]
+    # ...
+    ```
+
+4. Add the favicon on the base template
+
+    ```html
+    <!-- templates/base.html -->
+
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <!-- ... -->
+            <link rel="shortcut icon" href="{% static 'favicon.ico' %}"/>
+            <!-- ... -->
+        </head>
+        <!-- ... -->
+    </html>
+    
+    ```
 </details>
 
 ## Assignment Essay
