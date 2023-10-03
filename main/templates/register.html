@@ -36,23 +36,23 @@
         {% if messages %}
             <ul>
                 {% for message in messages %}
-                    <li class="text-red-500 font-semibold text-lg">{{ message }}</li>
+                    <li class="text-red-500 font-semibold text-md">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}     
         {% if form.errors.username %}
             <ul>
-                <li class="text-red-500 font-semibold text-lg">{{ form.errors.username }}</li>
+                <li class="text-red-500 font-semibold text-md">{{ form.errors.username }}</li>
             </ul>
         {% endif %}        
         {% if form.errors.password1 %}
             <ul>
-                <li class="text-red-500 font-semibold text-lg">{{ form.errors.password1 }}</li>
+                <li class="text-red-500 font-semibold text-md">{{ form.errors.password1 }}</li>
             </ul>
         {% endif %}        
         {% if form.errors.password2 %}
             <ul>
-                <li class="text-red-500 font-semibold text-lg">{{ form.errors.password2 }}</li>
+                <li class="text-red-500 font-semibold text-md">{{ form.errors.password2 }}</li>
             </ul>
         {% endif %}        
     </div>

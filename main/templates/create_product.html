@@ -2,8 +2,15 @@
 
 {% block content %}
 {% include 'navbar.html' %}
-<div class="flex flex-col justify-center items-center gap-8 p-8">
-    <h1 class="text-2xl font-semibold">Create New Product</h1>
+<div class="flex flex-col justify-center items-center gap-6 p-8">
+    <div class="flex justify-center items-center gap-2">
+        <a href="/">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            </svg>
+        </a>
+        <h1 class="text-3xl font-semibold">Create New Product</h1>
+    </div>
     <form method="POST" class="w-max flex flex-col gap-8">
         {% csrf_token %}
         <div class="grid grid-cols-4 gap-4 items-center">
