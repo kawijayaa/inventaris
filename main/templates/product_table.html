@@ -14,7 +14,7 @@
         <tr class="{% if product == last_product %} bg-cyan-700 {% else %} bg-neutral-700 {% endif %} text-white text-center">
             <td class="px-12 py-2 {% if product == last_product %} rounded-bl-xl {% endif %}">{{product.name}}</td>
             <td class="px-12 py-2">
-                <div class="flex justify-center items-center gap-4">
+                <div class="flex justify-between items-center gap-4">
                     <form method="post" action="/products/decrement/{{product.id}}/">
                         {% csrf_token %}
                         <button class="p-[2px] text-lg hover:text-green-400 transition-colors">-</button>
