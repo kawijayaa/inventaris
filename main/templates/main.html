@@ -1,8 +1,187 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% include 'navbar.html' %}
-<div class="flex justify-center p-8">
-    {% include 'product_table.html' %}
+<div class="flex justify-between px-8 py-4 bg-cyan-500 rounded-b-[2rem] drop-shadow-[0_10px_10px_rgb(255,255,255,0.25)]">
+    <div class="flex items-center gap-4">
+        <a href="/" class="text-4xl font-black">INVENTARIS</a>
+        <button class="text-4xl hover:text-green-400 transition-colors" data-modal-target="add_product_modal" data-modal-show="add_product_modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+        </a>
+    </div>
+    <div class="flex flex-col items-end text-right">
+        <p class="text-2xl leading-snug">Welcome, <span class="font-bold">{{ user.username }}</span> (PBP KKI)</p>
+        <p class="text-lg leading-snug">Last login: {{ last_login }}</p>
+        <a href="{% url 'main:logout' %}" class=" hover:text-red-500 hover:font-semibold transition-all w-max leading-snug">Logout</a>
+    </div>
 </div>
+
+<div id="add_product_modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto h-[calc(100%-1rem)] max-h-full">
+    <div class="bg-neutral-800 p-8 flex flex-col gap-8 rounded-xl">
+        <div class="flex justify-center items-center gap-2">
+            <h1 class="text-3xl font-semibold">Create New Product</h1>
+        </div>
+        <form class="w-max flex flex-col gap-8" id="product_form" onsubmit="return false;">
+            {% csrf_token %}
+            <div class="grid grid-cols-4 gap-4 items-center">
+                <label for="id_name" class="col-span-1">Name:</label>
+                <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                
+                <label for="id_amount" class="col-span-1">Amount:</label>
+                <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                
+                <label for="id_description" class="col-span-1">Description:</label>
+                <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3"></textarea>
+                
+                <label for="id_category" class="col-span-1">Category:</label>
+                <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                
+                <label for="id_price" class="col-span-1">Price:</label>
+                <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+            </div>
+            <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Create" id="create_button" data-modal-hide="add_product_modal">
+        </form>
+    </div>
+</div>
+
+<div class="flex justify-center p-8">
+    <div class="flex flex-col justify-center items-center gap-6">
+        <table id="product_table"></table>
+        <p>Total products: {{product_count}} product{{plural}}</p>
+    </div>
+</div>
+
+<script>
+    async function fetchProducts() {
+        document.getElementById("product_table").innerHTML = ""
+
+        const response = await fetch(
+            "{% url 'main:show_json' %}"
+        ).then((res) => res.json())
+
+        let table = `<tr class="bg-neutral-500 text-center">
+            <th class="px-12 py-2 rounded-tl-xl">Name</th>
+            <th class="px-12 py-2">Amount</th>
+            <th class="px-12 py-2">Description</th>
+            <th class="px-12 py-2">Category</th>
+            <th class="px-12 py-2">Price</th>
+            <th class="px-12 py-2">Date Added</th>
+            <th class="rounded-tr-xl"></th>
+        </tr>
+        `
+        response.forEach((product, idx) => {
+            table += `\n
+            <tr class="${(idx === response.length - 1) ? "bg-cyan-700" : "bg-neutral-700"} text-white text-center">
+            <td class="px-12 py-2 ${(idx === response.length - 1) ? "rounded-bl-xl" : ""}">${product.fields.name}</td>
+            <td class="px-12 py-2">
+                <div class="flex justify-between items-center gap-4">
+                    <form onsubmit="return false;">
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="p-[2px] text-lg hover:text-green-400 transition-colors decrement_button">-</button>
+                    </form>
+                    ${product.fields.amount}
+                    <form onsubmit="return false;">
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="p-[2px] text-lg hover:text-green-400 transition-colors increment_button">+</button>
+                    </form>
+                </div>
+            </td>
+            <td class="px-12 py-2">${product.fields.description}</td>
+            <td class="px-12 py-2">${product.fields.category}</td>
+            <td class="px-12 py-2">${product.fields.price}</td>
+            <td class="px-12 py-2">${product.fields.date_added}</td>
+            <td class="px-12 py-2 ${(idx === response.length - 1) ? "rounded-br-xl" : ""}">
+                <div class="flex gap-2">
+                    <form method="post" action="/products/edit/${product.pk}/" class="flex justify-center items-center">
+                        {% csrf_token %}
+                        <button class="hover:text-green-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                        </button>
+                    </form>
+                    <form class="flex justify-center items-center delete_form" onsubmit='return false;'>
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="hover:text-red-500 transition-colors delete_button" onsubmit='return false;'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+            `
+        })
+
+        document.getElementById("product_table").innerHTML = table
+        let delete_button = document.getElementsByClassName("delete_button")
+        for (var i = 0; i < delete_button.length; i++) {
+            delete_button[i].addEventListener('click', () => {
+                deleteProduct(event.currentTarget)
+            })
+        }
+
+        let increment_button = document.getElementsByClassName("increment_button")
+        for (var i = 0; i < increment_button.length; i++) {
+            increment_button[i].addEventListener('click', () => {
+                incrementProduct(event.currentTarget)
+            })
+        }
+
+        let decrement_button = document.getElementsByClassName("decrement_button")
+        for (var i = 0; i < decrement_button.length; i++) {
+            decrement_button[i].addEventListener('click', () => {
+                decrementProduct(event.currentTarget)
+            })
+        }
+    }
+
+    fetchProducts()
+
+    function createProduct() {
+        fetch("{% url 'main:create_product_ajax' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#product_form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+
+    function deleteProduct(button) {
+        fetch("{% url 'main:delete_product_ajax' %}", {
+            method: "POST",
+            body: new FormData(button.closest('form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+
+    function incrementProduct(button) {
+        fetch("{% url 'main:increment_amount_ajax' %}", {
+            method: "POST",
+            body: new FormData(button.closest('form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+
+    function decrementProduct(button) {
+        fetch("{% url 'main:decrement_amount_ajax' %}", {
+            method: "POST",
+            body: new FormData(button.closest('form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+
+    document.getElementById("create_button").onclick = createProduct
+</script>
 {% endblock content %}

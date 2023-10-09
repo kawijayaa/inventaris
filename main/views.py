@@ -1,5 +1,5 @@
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
@@ -13,6 +13,7 @@ from main.models import Product
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages  
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 @login_required(login_url='/login')
@@ -51,6 +52,24 @@ def create_product(request):
     }
     return render(request, 'create_product.html', context)
 
+@csrf_exempt
+@login_required(login_url='/login')
+def create_product_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        description = request.POST.get("description")
+        amount = request.POST.get("amount")
+        category = request.POST.get("category")
+        user = request.user
+
+        new_product = Product(user=user, name=name, amount=amount, description=description, category=category, price=price)
+        new_product.save()
+
+        return HttpResponse(b"OK", status=201)
+
+    return HttpResponse(status=405)
+
 @login_required(login_url='/login')
 def delete_product(request, id):
     try:
@@ -61,6 +80,21 @@ def delete_product(request, id):
         return HttpResponseRedirect(reverse('main:show_main'))
     except Product.DoesNotExist:
         return HttpResponse(status=204)
+
+@csrf_exempt
+@login_required(login_url='/login')
+def delete_product_ajax(request):
+    if request.method == "POST":
+        try:
+            product = Product.objects.get(pk=request.POST.get("id"))
+
+            if product.user.id != request.user.id:
+                return HttpResponse(status=403)
+            product.delete()
+            return HttpResponse(b"OK", status=201)
+        except Product.DoesNotExist:
+            return HttpResponse(status=204)
+        
 
 @login_required(login_url='/login')
 def show_products(request):
@@ -164,6 +198,36 @@ def decrement_amount(request, id):
         return HttpResponseRedirect(reverse('main:show_main'))
     else:
         return HttpResponse(status=403)
+    
+@csrf_exempt
+@login_required(login_url='/login')
+def increment_amount_ajax(request):
+    if request.method == "POST":
+        try:
+            product = Product.objects.get(pk=request.POST.get("id"))
+
+            if product.user.id != request.user.id:
+                return HttpResponse(status=403)
+            product.amount += 1
+            product.save()
+            return HttpResponse(b"OK", status=201)
+        except Product.DoesNotExist:
+            return HttpResponse(status=204)
+
+@csrf_exempt
+@login_required(login_url='/login')
+def decrement_amount_ajax(request):
+    if request.method == "POST":
+        try:
+            product = Product.objects.get(pk=request.POST.get("id"))
+
+            if product.user.id != request.user.id:
+                return HttpResponse(status=403)
+            product.amount -= 1
+            product.save()
+            return HttpResponse(b"OK", status=201)
+        except Product.DoesNotExist:
+            return HttpResponse(status=204)
 
 @login_required(login_url='/login')
 def edit_product(request, id):

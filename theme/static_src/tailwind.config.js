@@ -19,6 +19,7 @@ module.exports = {
          * Adjust the following line to match your project structure.
          */
         '../../templates/**/*.html',
+        './node_modules/flowbite/**/*.js',
 
         /*
          * Templates in other django apps (BASE_DIR/<any_app_name>/templates).
@@ -39,7 +40,8 @@ module.exports = {
          * Python: If you use Tailwind CSS classes in Python, uncomment the following line
          * and make sure the pattern below matches your project structure.
          */
-        // '../../**/*.py'
+        '../../**/*.py'
+
     ],
     theme: {
         extend: {},
@@ -54,5 +56,6 @@ module.exports = {
         require('@tailwindcss/typography'),
         require('@tailwindcss/line-clamp'),
         require('@tailwindcss/aspect-ratio'),
+        require('flowbite/plugin')
     ],
 }
