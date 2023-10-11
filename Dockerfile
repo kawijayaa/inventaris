@@ -28,6 +28,6 @@ RUN python manage.py tailwind build
 RUN chown -R django:django /app
 USER django
 
-RUN python manage.py migrate 
+# RUN python manage.py migrate 
 
-CMD gunicorn inventaris.wsgi:application --bind 0.0.0.0:5000
+# CMD gunicorn inventaris.wsgi:application --bind 0.0.0.0:5000
