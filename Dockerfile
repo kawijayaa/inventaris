@@ -21,13 +21,14 @@ RUN pip install -r /requirements.txt
 
 COPY . .
 
-RUN python manage.py collectstatic --noinput --clear
 RUN python manage.py tailwind install
 RUN python manage.py tailwind build
+RUN python manage.py collectstatic --noinput --clear
 
 RUN chown -R django:django /app
 USER django
 
+# Uncomment below for development
 # RUN python manage.py migrate 
 
 # CMD gunicorn inventaris.wsgi:application --bind 0.0.0.0:5000
