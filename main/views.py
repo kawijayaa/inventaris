@@ -28,10 +28,7 @@ def show_main(request):
         'name': request.user.username,
         'class': 'PBP KKI',
         'products': products,
-        'product_count': product_count,
-        'plural': 's' if product_count != 1 else '',
         'last_login': datetime.datetime.strptime(request.COOKIES['last_login'], '%Y-%m-%d %H:%M:%S.%f'),
-        'last_product': products.last(),
     }
 
     return render(request, 'main.html', context)

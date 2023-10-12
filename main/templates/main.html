@@ -18,6 +18,13 @@
     </div>
 </div>
 
+<div class="flex justify-center p-8">
+    <div class="flex flex-col justify-center items-center gap-6">
+        <table id="product_table"></table>
+        <p id="total_product">Total products: ${response.length} product{{plural}}</p>
+    </div>
+</div>
+
 <div id="add_product_modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto h-[calc(100%-1rem)] max-h-full">
     <div class="bg-neutral-800 p-8 flex flex-col gap-8 rounded-xl">
         <div class="flex justify-center items-center gap-2">
@@ -112,13 +119,7 @@
 
         document.getElementById("product_table").innerHTML = table
 
-        document.getElementById("product_table").innerHTML += `\n
-        <div class="flex justify-center p-8">
-            <div class="flex flex-col justify-center items-center gap-6">
-                <table id="product_table"></table>
-                <p>Total products: {{product_count}} product{{plural}}</p>
-            </div>
-        </div>`
+        document.getElementById("total_product").innerHTML = `Total products: ${response.length} product${response.length > 1 ? "s" : ""}`
 
         let delete_button = document.getElementsByClassName("delete_button")
         for (var i = 0; i < delete_button.length; i++) {
