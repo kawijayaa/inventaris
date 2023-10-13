@@ -1450,6 +1450,327 @@
     ```
 </details>
 
+### Assignment 6
+
+<details>
+
+<summary>AJAX GET</summary>
+
+1. Create script on the main.html file to get products asynchronously
+
+    ```js
+    async function fetchProducts() {
+        document.getElementById("product_table").innerHTML = ""
+
+        const response = await fetch(
+            "{% url 'main:show_json' %}"
+        ).then((res) => res.json())
+
+        let table = `<tr class="bg-neutral-500 text-center">
+            <th class="px-12 py-2 rounded-tl-xl">Name</th>
+            <th class="px-12 py-2">Amount</th>
+            <th class="px-12 py-2">Description</th>
+            <th class="px-12 py-2">Category</th>
+            <th class="px-12 py-2">Price</th>
+            <th class="px-12 py-2">Date Added</th>
+            <th class="rounded-tr-xl"></th>
+        </tr>
+        `
+        response.forEach((product, idx) => {
+            table += `\n
+            <tr class="${(idx === response.length - 1) ? "bg-cyan-700" : "bg-neutral-700"} text-white text-center">
+            <td class="px-12 py-2 ${(idx === response.length - 1) ? "rounded-bl-xl" : ""}">${product.fields.name}</td>
+            <td class="px-12 py-2">
+                <div class="flex justify-between items-center gap-4">
+                    <form onsubmit="return false;">
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="p-[2px] text-lg hover:text-green-400 transition-colors decrement_button">-</button>
+                    </form>
+                    ${product.fields.amount}
+                    <form onsubmit="return false;">
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="p-[2px] text-lg hover:text-green-400 transition-colors increment_button">+</button>
+                    </form>
+                </div>
+            </td>
+            <td class="px-12 py-2">${product.fields.description}</td>
+            <td class="px-12 py-2">${product.fields.category}</td>
+            <td class="px-12 py-2">${product.fields.price}</td>
+            <td class="px-12 py-2">${product.fields.date_added}</td>
+            <td class="px-12 py-2 ${(idx === response.length - 1) ? "rounded-br-xl" : ""}">
+                <div class="flex gap-2">
+                    <form method="post" action="/products/edit/${product.pk}/" class="flex justify-center items-center">
+                        {% csrf_token %}
+                        <button class="hover:text-green-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                        </button>
+                    </form>
+                    <form class="flex justify-center items-center delete_form" onsubmit='return false;'>
+                        <input hidden value="${product.pk}" name="id"></input>
+                        <button class="hover:text-red-500 transition-colors delete_button" onsubmit='return false;'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+            `
+        })
+
+        document.getElementById("product_table").innerHTML = table
+
+        document.getElementById("total_product").innerHTML = `Total products: ${response.length} product${response.length > 1 ? "s" : ""}`
+
+        let delete_button = document.getElementsByClassName("delete_button")
+        for (var i = 0; i < delete_button.length; i++) {
+            delete_button[i].addEventListener('click', () => {
+                deleteProduct(event.currentTarget)
+            })
+        }
+
+        let increment_button = document.getElementsByClassName("increment_button")
+        for (var i = 0; i < increment_button.length; i++) {
+            increment_button[i].addEventListener('click', () => {
+                incrementProduct(event.currentTarget)
+            })
+        }
+
+        let decrement_button = document.getElementsByClassName("decrement_button")
+        for (var i = 0; i < decrement_button.length; i++) {
+            decrement_button[i].addEventListener('click', () => {
+                decrementProduct(event.currentTarget)
+            })
+        }
+    }
+
+    fetchProducts()
+    ```
+
+2. Modify table on main.html
+
+    ```html
+    <!-- main/templates/main.html -->
+
+    <div class="flex justify-center p-8">
+        <div class="flex flex-col justify-center items-center gap-6">
+            <table id="product_table"></table>
+            <p id="total_product">Total products: ${response.length} product{{plural}}</p>
+        </div>
+    </div>
+    ```
+
+</details>
+
+<details>
+
+<summary>AJAX POST</summary>
+
+1. Create a new create_product view for AJAX
+
+    ```py
+    @csrf_exempt
+    @login_required(login_url='/login')
+    def create_product_ajax(request):
+        if request.method == 'POST':
+            name = request.POST.get("name")
+            price = request.POST.get("price")
+            description = request.POST.get("description")
+            amount = request.POST.get("amount")
+            category = request.POST.get("category")
+            user = request.user
+
+            new_product = Product(user=user, name=name, amount=amount, description=description, category=category, price=price)
+            new_product.save()
+
+            return HttpResponse(b"OK", status=201)
+
+        return HttpResponse(status=405)
+    ```
+
+2. Route view to url
+
+    ```py
+    path('products/create-ajax/', create_product_ajax, name='create_product_ajax'),
+    ```
+
+3. Create modal in main.html
+
+    ```html
+    <div id="add_product_modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto h-[calc(100%-1rem)] max-h-full">
+        <div class="bg-neutral-800 p-8 flex flex-col gap-8 rounded-xl">
+            <div class="flex justify-center items-center gap-2">
+                <h1 class="text-3xl font-semibold">Create New Product</h1>
+            </div>
+            <form class="w-max flex flex-col gap-8" id="product_form" onsubmit="return false;">
+                {% csrf_token %}
+                <div class="grid grid-cols-4 gap-4 items-center">
+                    <label for="id_name" class="col-span-1">Name:</label>
+                    <input type="text" name="name" maxlength="100" required id="id_name" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                    
+                    <label for="id_amount" class="col-span-1">Amount:</label>
+                    <input type="text" name="amount" required id="id_amount" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                    
+                    <label for="id_description" class="col-span-1">Description:</label>
+                    <textarea name="description" cols="40" rows="10" required id="id_description" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3"></textarea>
+                    
+                    <label for="id_category" class="col-span-1">Category:</label>
+                    <input type="text" name="category" maxlength="100" required id="id_category" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                    
+                    <label for="id_price" class="col-span-1">Price:</label>
+                    <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                </div>
+                <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Create" id="create_button" data-modal-hide="add_product_modal">
+            </form>
+        </div>
+    </div>
+    ```
+
+4. Add script to add product asynchronously
+
+    ```js
+    function createProduct() {
+        fetch("{% url 'main:create_product_ajax' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#product_form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+    
+    document.getElementById("create_button").onclick = createProduct
+    ```
+
+</details>
+
+<details>
+
+<summary>AJAX DELETE</summary>
+
+1. Create script to delete asynchronously
+
+    ```js
+    function deleteProduct(button) {
+        fetch("{% url 'main:delete_product_ajax' %}", {
+            method: "POST",
+            body: new FormData(button.closest('form'))
+        }).then(fetchProducts)
+
+        document.getElementById("product_form").reset()
+        return false
+    }
+    ```
+
+2. Create view and url for AJAX
+
+    ```py
+    @csrf_exempt
+    @login_required(login_url='/login')
+    def delete_product_ajax(request):
+        if request.method == "POST":
+            try:
+                product = Product.objects.get(pk=request.POST.get("id"))
+
+                if product.user.id != request.user.id:
+                    return HttpResponse(status=403)
+                product.delete()
+                return HttpResponse(b"OK", status=201)
+            except Product.DoesNotExist:
+                return HttpResponse(status=204)
+    ```
+
+    ```py
+    path('products/delete-ajax', delete_product_ajax, name='delete_product_ajax'),
+    ```
+
+</details>
+
+<details>
+
+<summary>Deployment</summary>
+
+1. Create new Dockerfile
+
+    ```
+    FROM python:3.11-bookworm
+
+    WORKDIR /app
+
+    ENV PYTHONUNBUFFERED=1 \
+        PYTHONPATH=/app \
+        DJANGO_SETTINGS_MODULE=inventaris.settings \
+        PORT=8000 \
+        WEB_CONCURRENCY=2
+
+    RUN apt-get update --yes --quiet \
+        && apt-get install --yes --quiet --no-install-recommends \
+        && apt-get install nodejs -y \
+        && apt install npm -y --fix-missing
+
+    RUN addgroup --system django \
+        && adduser --system --ingroup django django
+
+    COPY ./requirements.txt /requirements.txt
+    RUN pip install -r /requirements.txt
+
+    COPY . .
+
+    RUN python manage.py tailwind install
+    RUN python manage.py tailwind build
+    RUN python manage.py collectstatic --noinput --clear
+
+    RUN chown -R django:django /app
+    USER django
+
+    # Uncomment below for development
+    # RUN python manage.py migrate 
+
+    # CMD gunicorn inventaris.wsgi:application --bind 0.0.0.0:5000
+    ```
+
+2. Create Procfile
+
+    ```
+    release: django-admin migrate --noinput
+    web: gunicorn inventaris.wsgi:application
+    ```
+
+3. Create Github Actions workflow
+
+    ```
+    name: Deploy
+
+    on:
+    push:
+        branches:
+        - main
+        - master
+
+    jobs:
+    Deployment:
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        steps:
+        - name: Cloning repo
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+
+        - name: Push to Dokku server
+        uses: dokku/github-action@master
+        with:
+            branch: 'main'
+            git_remote_url: ssh://dokku@${{ secrets.DOKKU_SERVER_IP }}/${{ secrets.DOKKU_APP_NAME }}
+            ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+    ```
+
+</details>
+
 ## Assignment Essay
 
 <details>
@@ -1562,5 +1883,28 @@ Margin defines the amount of space outside of the element, padding defines the a
 One of the pros of Tailwind is its flexibility and freedom, which supports unique designs from the developers. Bootstrap offers a "ready-made" feel to the website, so it's not as customizable as Tailwind.
 
 Bootstrap can be used if the developer does not want to design a website from scratch. Tailwind can be used if the developer wants more freedom designing the website.
+
+</details>
+
+<details>
+
+<summary>Assignment 6</summary>
+
+### Asynchronous vs Synchronous
+
+The short answer is synchronous programming runs code within a sequence. Asynchronous programming enables developer to run code in parallel
+
+### Event-driven programming
+
+Event-driven programming is a paradigm where flow of the program is determined by events (e.g mouse clicks, keyboard presses, etc)
+
+### Asynchronous in AJAX
+
+AJAX is executed if there is an event. After detecting an event, it will create an XMLHttpRequest and send the request to the server. After getting a response, it will be parsed and used.
+
+### jQuery vs FETCH API
+
+jQuery is one of the older JS libraries. Fetch API is built into JS.
+I prefer using Fetch API because I am more used to it rather than jQuery.
 
 </details>
