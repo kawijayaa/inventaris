@@ -1,4 +1,4 @@
-# [Inventaris](https://oka-inventaris.adaptable.app/)
+# [Inventaris](http://muhammad-oka-tugas.pbp.cs.ui.ac.id)
 #### Muhammad Oka - 2206046784
 
 ## Assignment Steps
