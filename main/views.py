@@ -1,5 +1,6 @@
 import datetime
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+import json
+from django.http import HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
@@ -58,10 +59,14 @@ def create_product_ajax(request):
         description = request.POST.get("description")
         amount = request.POST.get("amount")
         category = request.POST.get("category")
+        hidden = request.POST.get("hidden") == "on"
         user = request.user
 
-        new_product = Product(user=user, name=name, amount=amount, description=description, category=category, price=price)
-        new_product.save()
+        try:
+            new_product = Product(user=user, name=name, amount=amount, description=description, category=category, price=price, hidden=hidden)
+            new_product.save()
+        except:
+            return HttpResponse(b"Error")
 
         return HttpResponse(b"OK", status=201)
 
@@ -116,7 +121,7 @@ def show_xml(request):
 
 @login_required(login_url='/login')
 def show_json(request):
-    products = Product.objects.filter(user=request.user)
+    products = Product.objects.filter(user=request.user, hidden=False)
     data = serializers.serialize('json', products)
 
     return HttpResponse(data, content_type='application/json')
@@ -243,3 +248,25 @@ def edit_product(request, id):
 
     context = {'form': form}
     return render(request, "edit_product.html", context)
+
+@csrf_exempt
+def create_product_json(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        new_product = Product.objects.create(
+            user = request.user,
+            name = data["name"],
+            amount = data["amount"],
+            description = data["description"],
+            category = data["category"],
+            price = int(data["price"]),
+            hidden = False,
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)

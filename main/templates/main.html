@@ -47,11 +47,15 @@
                 
                 <label for="id_price" class="col-span-1">Price:</label>
                 <input type="text" name="price" required id="id_price" class="form-control text-black appearance-none outline-none border-none rounded focus:shadow-none focus:border-none focus:ring-0 hover:outline-cyan-500 hover:outline-2 focus:outline-cyan-500 focus:outline-2 transition-[outline] col-span-3">
+                
+                <label for="hidden" class="col-span-1">Hidden</label>
+                <input type="checkbox" name="hidden">
             </div>
             <input class="border-2 border-cyan-500 bg-cyan-800 hover:bg-cyan-500 text-white px-3 py-1 rounded hover:cursor-pointer transition-colors" type="submit" value="Create" id="create_button" data-modal-hide="add_product_modal">
         </form>
     </div>
 </div>
+
 
 <script>
     async function fetchProducts() {

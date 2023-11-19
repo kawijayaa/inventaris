@@ -1,5 +1,5 @@
 from django.urls import path
-from main.views import create_product_ajax, show_main, create_product, delete_product, show_products, show_xml, show_json, show_xml_by_id, show_json_by_id, register, login_user, logout_user, increment_amount, decrement_amount, edit_product, delete_product_ajax, increment_amount_ajax, decrement_amount_ajax
+from main.views import create_product_ajax, create_product_json, show_main, create_product, delete_product, show_products, show_xml, show_json, show_xml_by_id, show_json_by_id, register, login_user, logout_user, increment_amount, decrement_amount, edit_product, delete_product_ajax, increment_amount_ajax, decrement_amount_ajax
 
 app_name = 'main'
 urlpatterns = [
@@ -21,4 +21,5 @@ urlpatterns = [
     path('products/delete-ajax', delete_product_ajax, name='delete_product_ajax'),
     path('products/increment-ajax/', increment_amount_ajax, name='increment_amount_ajax'),
     path('products/decrement-ajax/', decrement_amount_ajax, name='decrement_amount_ajax'),
+    path('api/products/create/', create_product_json, name='create_product_json')
 ]

@@ -9,4 +9,5 @@ class Product(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     price = models.IntegerField()
+    hidden = models.BooleanField()
     date_added = models.DateTimeField(auto_now_add=True)
